@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.ZanInfoDao">
+    <resultMap id="resultMap" type="ZanInfo">
+        <id property="id" column="id" javaType="Integer"></id>
+        <result property="uid" column="uid" javaType="Integer"></result>
+        <result property="pid" column="pid" javaType="Integer"></result>
+        <result property="oid" column="oid" javaType="Integer"></result>
+        <association property="user" column="uid" javaType="UserInfo" select="edu.qtech.rs.dao.UserDao.selectOne"></association>
+        <association property="product" column="pid" javaType="ProductInfo" select="edu.qtech.rs.dao.ProductDao.selectById"></association>
+        <association property="order" column="oid" javaType="OrderMaster" select="edu.qtech.rs.dao.OrderMasterDao.selectById"></association>
+    </resultMap>
+    <select id="select" parameterType="Integer" resultMap="resultMap">
+        select * from zan_info where uid=#{uid} and pid=#{pid} and oid=#{oid}
+    </select>
+    <insert id="insert" parameterType="Integer" useGeneratedKeys="true">
+        insert into zan_info(uid,pid,oid) values(#{uid},#{pid},#{oid})
+    </insert>
+    <delete id="delete" parameterType="Integer">
+        delete from zan_info where uid=#{uid} and pid=#{pid} and oid=#{oid}
+    </delete>
+    <select id="selectAll" resultMap="resultMap">
+        select * from zan_info
+    </select>
+    <select id="selectByKey" parameterType="String" resultMap="resultMap">
+        select distinct z.* from zan_info z,user_info u,product_info p,order_master o where (u.user_username=#{key} and z.uid=u.user_id)
+        or (p.product_name like '%${key}%' and z.pid=p.product_id) or (o.order_code=#{key} and z.oid=o.order_id)
+    </select>
+    <delete id="deleteByid" parameterType="Integer">
+        delete from zan_info where id=#{id}
+    </delete>
+</mapper>

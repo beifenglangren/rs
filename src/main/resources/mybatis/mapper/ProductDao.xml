@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.ProductDao">
+    <resultMap id="resultMap" type="ProductInfo">
+        <id property="productId" column="product_id" javaType="Integer"></id>
+        <result property="productName" column="product_name" javaType="String"></result>
+        <result property="productDesc" column="product_desc" javaType="String"></result>
+        <result property="productPrice" column="product_price" javaType="Float"></result>
+        <result property="productStock" column="product_stock" javaType="Integer"></result>
+        <result property="productImg" column="product_img" javaType="String"></result>
+        <result property="createTime" column="create_time" javaType="java.util.Date"></result>
+        <result property="updateTime" column="update_time" javaType="java.util.Date"></result>
+        <result property="shopId" column="shop_id" javaType="Integer"></result>
+        <result property="categoryId" column="category_id" javaType="Integer"></result>
+        <result property="saleCount" column="sale_count" javaType="Integer"></result>
+        <result property="productZan" column="product_zan" javaType="Integer"></result>
+        <association property="shop" column="shop_id" javaType="ShopInfo" select="edu.qtech.rs.dao.ShopDao.selectById"></association>
+        <association property="category" column="category_id" javaType="CategoryInner" select="edu.qtech.rs.dao.CategoryInnerDao.selectById"></association>
+    </resultMap>
+    <select id="selectByName" parameterType="String" resultMap="resultMap">
+        select * from product_info where product_name like '%${productname}%' and shop_id=#{shopid}
+    </select>
+    <select id="selectByShopId" parameterType="Integer" resultMap="resultMap">
+        select * from product_info where shop_id=#{id}
+    </select>
+    <select id="selectByCidAndShopId" parameterType="Integer" resultMap="resultMap">
+        select * from product_info where category_id=#{cid} and shop_id=#{sid}
+    </select>
+    <update id="update" parameterType="ProductInfo">
+        update product_info
+        <set>
+            <if test="productName!=null">
+                product_name=#{productName},
+            </if>
+            <if test="productDesc!=null">
+                product_desc=#{productDesc},
+            </if>
+            <if test="productPrice!=null">
+                product_price=#{productPrice},
+            </if>
+            <if test="productStock!=null">
+                product_stock=#{productStock},
+            </if>
+            <if test="productImg!=null">
+                product_img=#{productImg},
+            </if>
+            <if test="createTime!=null">
+                create_time=#{createTime},
+            </if>
+            <if test="updateTime!=null">
+                update_time=#{updateTime},
+            </if>
+            <if test="shopId!=null">
+                shop_id=#{shopId},
+            </if>
+            <if test="categoryId!=null">
+                category_id=#{categoryId},
+            </if>
+            <if test="saleCount!=null">
+                sale_count=#{saleCount},
+            </if>
+            <if test="productZan!=null">
+                product_zan=#{productZan}
+            </if>
+        </set>
+        where product_id=#{productId}
+    </update>
+    <select id="selectById" parameterType="Integer" resultMap="resultMap">
+        select * from product_info where product_id=#{id}
+    </select>
+    <select id="selectOftenBuy" parameterType="Integer" resultMap="resultMap">
+        select distinct p.* from order_detail o,product_info p where o.product_id=p.product_id and o.user_id=#{id} order by o.order_id desc
+    </select>
+    <insert id="insert" parameterType="ProductInfo" useGeneratedKeys="true">
+        insert into product_info(product_name,product_desc,product_price,product_stock,product_img,create_time,update_time,shop_id,
+        category_id) values(#{productName},#{productDesc},#{productPrice},#{productStock},#{productImg},#{createTime},#{updateTime},
+        #{shopId},#{categoryId})
+    </insert>
+    <select id="selectByOnlyName" resultMap="resultMap">
+        select * from product_info where product_name=#{productname} and shop_id=#{shopid}
+    </select>
+    <select id="selectByEditName" resultMap="resultMap">
+        select * from product_info where product_name=#{productname} and shop_id=#{shopid} and product_id not in (#{productid})
+    </select>
+    <delete id="delete" parameterType="Integer">
+        delete from product_info where product_id=#{id}
+    </delete>
+    <delete id="deletelist" parameterType="Integer">
+        delete from product_info where product_id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

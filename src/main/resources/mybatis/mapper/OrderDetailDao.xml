@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.OrderDetailDao">
+    <resultMap id="resultMap" type="OrderDetail">
+        <id property="orderId" column="order_id" javaType="Integer"></id>
+        <result property="orderCount" column="order_count" javaType="Integer"></result>
+        <result property="orderAmount" column="order_amount" javaType="Float"></result>
+        <result property="productId" column="product_id" javaType="Integer"></result>
+        <result property="shopId" column="shop_id" javaType="Integer"></result>
+        <result property="masterId" column="master_id" javaType="Integer"></result>
+        <result property="userId" column="user_id" javaType="Integer"></result>
+        <association property="product" column="product_id" javaType="ProductInfo" select="edu.qtech.rs.dao.ProductDao.selectById"></association>
+    </resultMap>
+    <insert id="insert" parameterType="OrderDetail" useGeneratedKeys="true">
+        insert into order_detail(order_count,order_amount,product_id,shop_id,master_id,user_id)
+        values (#{orderCount},#{orderAmount},#{productId},#{shopId},#{masterId},#{userId})
+    </insert>
+    <select id="selectByMasterId" parameterType="Integer" resultMap="resultMap">
+        select * from order_detail where master_id=#{id}
+    </select>
+    <select id="selectByPid" parameterType="Integer" resultMap="resultMap">
+        select * from order_detail where product_id=#{pid}
+    </select>
+    <delete id="deletelist" parameterType="Integer">
+        delete from order_detail where order_id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

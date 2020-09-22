@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.UserDao">
+    <resultMap id="resultMap" type="UserInfo">
+        <id property="userId" column="user_id" javaType="Integer"></id>
+        <result property="userUsername" column="user_username" javaType="String"></result>
+        <result property="userPassword" column="user_password" javaType="String"></result>
+        <result property="userIdentity" column="user_identity" javaType="Integer"></result>
+        <result property="userAddress" column="user_address" javaType="String"></result>
+        <result property="userPhone" column="user_phone" javaType="String"></result>
+        <result property="userAge" column="user_age" javaType="Integer"></result>
+        <result property="userName" column="user_name" javaType="String"></result>
+        <result property="userSex" column="user_sex" javaType="String"></result>
+    </resultMap>
+<insert id="insertUser" useGeneratedKeys="true" parameterType="UserInfo">
+    insert into user_info(user_username,user_password,user_identity,user_address,user_phone,user_age,user_name,user_sex) values
+    (#{userUsername},#{userPassword},#{userIdentity},#{userAddress},#{userPhone},#{userAge},#{userName},#{userSex})
+</insert>
+    <select id="getUser" resultMap="resultMap">
+        select * from user_info where user_username=#{username} and user_password=#{password}
+    </select>
+    <select id="getUserByUsername" resultMap="resultMap">
+        select * from user_info where user_username=#{username}
+    </select>
+    <select id="selectOne" parameterType="Integer" resultMap="resultMap">
+        select * from user_info where user_id=#{id}
+    </select>
+    <update id="updateUser" parameterType="UserInfo">
+        update user_info
+        <set>
+            <if test="userUsername!=null">user_username=#{userUsername},</if>
+            <if test="userPassword!=null">user_password=#{userPassword},</if>
+            <if test="userIdentity!=null">user_identity=#{userIdentity},</if>
+            <if test="userAddress!=null">user_address=#{userAddress},</if>
+            <if test="userPhone!=null">user_phone=#{userPhone},</if>
+            <if test="userAge!=null">user_age=#{userAge},</if>
+            <if test="userName!=null">user_name=#{userName},</if>
+            <if test="userSex!=null">user_sex=#{userSex},</if>
+        </set>
+        where user_id=#{userId}
+    </update>
+    <select id="selectAll" resultMap="resultMap">
+        select * from user_info where user_identity!=2
+    </select>
+    <select id="selectByKey" parameterType="String" resultMap="resultMap">
+        select * from user_info where user_username like '%${key}%' or user_address like '%${key}%' or user_phone like '%${key}%' or user_name like '%${key}%'
+    </select>
+    <select id="selectByIdentity" parameterType="Integer" resultMap="resultMap">
+        select * from user_info where user_identity=#{iden}
+    </select>
+    <select id="checkEditUsername" resultMap="resultMap">
+        select * from user_info where user_username=#{username} and user_id not in (#{id})
+    </select>
+    <delete id="delete" parameterType="Integer">
+        delete from user_info where user_id=#{id}
+    </delete>
+</mapper>

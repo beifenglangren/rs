@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.MessageDao">
+    <resultMap id="resultMap" type="MessageInfo">
+        <id property="id" column="id" javaType="Integer"></id>
+        <result property="content" column="content" javaType="String"></result>
+        <result property="reviewId" column="review_id" javaType="Integer"></result>
+        <result property="status" column="status" javaType="Integer"></result>
+        <result property="createTime" column="create_time" javaType="java.util.Date"></result>
+    </resultMap>
+    <select id="select" parameterType="Integer" resultMap="resultMap">
+        select * from message_info where review_id=#{rid} order by create_time
+    </select>
+    <insert id="insert" parameterType="MessageInfo" useGeneratedKeys="true">
+        insert into message_info(content,review_id,status,create_time) values(#{content},#{reviewId},#{status},#{createTime})
+    </insert>
+    <delete id="delete" parameterType="Integer">
+        delete from message_info where id=#{id}
+    </delete>
+</mapper>

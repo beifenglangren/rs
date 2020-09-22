@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.ShopCollectDao">
+    <resultMap id="resultMap" type="ShopCollect">
+        <id property="id" column="id" javaType="Integer"></id>
+        <result property="uid" column="uid" javaType="Integer"></result>
+        <result property="sid" column="sid" javaType="Integer"></result>
+        <association property="shop" column="sid" javaType="ShopInfo" select="edu.qtech.rs.dao.ShopDao.selectById"></association>
+        <association property="user" column="uid" javaType="UserInfo" select="edu.qtech.rs.dao.UserDao.selectOne"></association>
+    </resultMap>
+    <select id="selectByUidAndSid" parameterType="Integer" resultMap="resultMap">
+        select * from shop_collect where uid=#{uid} and sid=#{sid}
+    </select>
+    <insert id="insert" parameterType="Integer" useGeneratedKeys="true">
+        insert into shop_collect(uid,sid) values(#{uid},#{sid})
+    </insert>
+    <delete id="delete" parameterType="Integer">
+        delete from shop_collect where uid=#{uid} and sid=#{sid}
+    </delete>
+    <select id="selectByUid" parameterType="Integer" resultMap="resultMap">
+        select * from shop_collect where uid=#{uid}
+    </select>
+    <select id="selectAll" resultMap="resultMap">
+        select * from shop_collect
+    </select>
+    <select id="selectByKey" parameterType="String" resultMap="resultMap">
+        select distinct e.* from shop_collect e,user_info u,shop_info s where (u.user_username=#{key} and e.uid=u.user_id) or (u.user_name like '%${key}%' and e.uid=u.user_id)
+        or (s.shop_name like '%${key}%' and e.sid=s.shop_id)
+    </select>
+    <delete id="deleteById" parameterType="Integer">
+        delete from shop_collect where id=#{id}
+    </delete>
+</mapper>

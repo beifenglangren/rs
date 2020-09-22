@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.OrderMasterDao">
+    <resultMap id="resultMap" type="OrderMaster">
+        <id property="orderId" column="order_id" javaType="Integer"></id>
+        <result property="orderCode" column="order_code" javaType="String"></result>
+        <result property="orderAddress" column="order_address" javaType="String"></result>
+        <result property="orderReceiver" column="order_receiver" javaType="String"></result>
+        <result property="orderPhone" column="order_phone" javaType="String"></result>
+        <result property="orderStatus" column="order_status" javaType="Integer"></result>
+        <result property="createTime" column="create_time" javaType="java.util.Date"></result>
+        <result property="deliveryTime" column="delivery_time" javaType="java.util.Date"></result>
+        <result property="confirmTime" column="confirm_time" javaType="java.util.Date"></result>
+        <result property="orderInfo" column="order_info" javaType="String"></result>
+        <result property="orderTotal" column="order_total" javaType="Float"></result>
+        <result property="userId" column="user_id" javaType="Integer"></result>
+        <result property="shopId" column="shop_id" javaType="Integer"></result>
+        <association property="shop" column="shop_id" javaType="ShopInfo" select="edu.qtech.rs.dao.ShopDao.selectById"></association>
+        <association property="user" column="user_id" javaType="UserInfo" select="edu.qtech.rs.dao.UserDao.selectOne"></association>
+    </resultMap>
+    <resultMap id="resultMap2" type="MonthSale">
+        <result property="month" column="MONTH(create_time)" javaType="Integer"></result>
+        <result property="sale" column="SUM(order_total)" javaType="Float"></result>
+    </resultMap>
+    <insert id="insert" parameterType="OrderMaster" useGeneratedKeys="true">
+        insert into order_master(order_code,order_address,order_receiver,order_phone,order_status,create_time,delivery_time
+        ,confirm_time,order_info,order_total,user_id,shop_id) values (#{orderCode},#{orderAddress},#{orderReceiver},#{orderPhone},#{orderStatus},#{createTime},
+        #{deliveryTime},#{confirmTime},#{orderInfo},#{orderTotal},#{userId},#{shopId})
+    </insert>
+    <select id="selectByCode" parameterType="String" resultMap="resultMap">
+        select * from order_master where order_code=#{code}
+    </select>
+    <select id="selectById" parameterType="Integer" resultMap="resultMap">
+        select * from order_master where order_id=#{id}
+    </select>
+    <update id="update" parameterType="OrderMaster">
+        update order_master
+        <set>
+            <if test="orderCode!=null">
+                order_code=#{orderCode},
+            </if>
+            <if test="orderAddress!=null">
+                order_address=#{orderAddress},
+            </if>
+            <if test="orderReceiver!=null">
+                order_receiver=#{orderReceiver},
+            </if>
+            <if test="orderPhone!=null">
+                order_phone=#{orderPhone},
+            </if>
+            <if test="orderStatus!=null">
+                order_status=#{orderStatus},
+            </if>
+            <if test="createTime!=null">
+                create_time=#{createTime},
+            </if>
+            <if test="deliveryTime!=null">
+                delivery_time=#{deliveryTime},
+            </if>
+            <if test="confirmTime!=null">
+                confirm_time=#{confirmTime},
+            </if>
+            <if test="orderInfo!=null">
+                order_info=#{orderInfo},
+            </if>
+            <if test="orderTotal!=null">
+                order_total=#{orderTotal},
+            </if>
+            <if test="userId!=null">
+                user_id=#{userId},
+            </if>
+            <if test="shopId!=null">
+                shop_id=#{shopId}
+            </if>
+        </set>
+        where order_id=#{orderId}
+    </update>
+    <select id="selectByUserId" parameterType="Integer" resultMap="resultMap">
+        select * from order_master where user_id=#{id} order by create_time desc
+    </select>
+    <select id="selectByUserIdAndStatus" parameterType="Integer" resultMap="resultMap">
+        select * from order_master where user_id=#{uid} and order_status=#{sid} order by create_time desc
+    </select>
+    <select id="selectByUserIdAndKey" resultMap="resultMap">
+        select distinct m.* from shop_info s,product_info p,order_detail d,order_master m where (s.shop_name like '%${key}%'
+        and s.shop_id=m.shop_id and m.user_id=#{uid}) or (p.product_name like '%${key}%' and p.product_id=d.product_id and
+        d.master_id=m.order_id and m.user_id=#{uid}) order by create_time desc
+    </select>
+    <select id="selectByShopId" parameterType="Integer" resultMap="resultMap">
+        select * from order_master where shop_id=#{shopId}
+    </select>
+    <select id="selectByMonth" parameterType="Integer" resultMap="resultMap2">
+        SELECT MONTH(create_time),SUM(order_total) from order_master where shop_id=#{shopId} and order_status!=0 and order_status!=5 GROUP BY month(create_time) ORDER BY month(create_time)
+    </select>
+    <select id="selectByShopAndUser" parameterType="Integer" resultMap="resultMap">
+        SELECT o.* from order_master o,shop_info s WHERE o.order_status=1 and s.user_id=#{uid} and o.shop_id=s.shop_id order by o.create_time
+    </select>
+    <select id="selectShopOrder" parameterType="Integer" resultMap="resultMap">
+        SELECT o.* from order_master o,shop_info s WHERE s.user_id=#{uid} and o.shop_id=s.shop_id order by o.create_time desc
+    </select>
+    <select id="selectCancelShopOrder" parameterType="Integer" resultMap="resultMap">
+        SELECT o.* from order_master o,shop_info s WHERE o.order_status=5 and s.user_id=#{uid} and o.shop_id=s.shop_id order by o.create_time
+    </select>
+    <select id="selectShopOrderByKey" resultMap="resultMap">
+        SELECT distinct m.* from order_master m,shop_info s,product_info p,order_detail d,user_info u WHERE (s.user_id=#{uid} and m.shop_id=s.shop_id and s.shop_name like '%${keyword}%') or
+        (p.product_name like '%${keyword}%' and s.user_id=#{uid} and m.shop_id=s.shop_id and p.product_id=d.product_id and
+        d.master_id=m.order_id) or(s.user_id=#{uid} and m.shop_id=s.shop_id and m.order_code=#{keyword}) or (s.user_id=#{uid} and m.shop_id=s.shop_id and m.order_receiver like '%${keyword}%') or(s.user_id=#{uid} and m.shop_id=s.shop_id and m.order_phone=#{keyword}) order by m.create_time desc
+    </select>
+    <select id="selectAll" resultMap="resultMap">
+        select * from order_master order by create_time desc
+    </select>
+    <select id="selectAllOrderByKey" parameterType="String" resultMap="resultMap">
+        select distinct o.* from order_master o,shop_info s where (o.order_code=#{keyword}) or (o.order_address like '%${keyword}%') or (o.order_receiver like '%${keyword}%') or (o.order_phone=#{keyword}) or(s.shop_name like '%${keyword}%' and o.shop_id=s.shop_id) order by o.create_time desc
+    </select>
+</mapper>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.ShopDao">
+    <resultMap id="resultMap" type="ShopInfo">
+        <id property="shopId" column="shop_id" javaType="Integer"></id>
+        <result property="shopName" column="shop_name" javaType="String"></result>
+        <result property="shopAddress" column="shop_address" javaType="String"></result>
+        <result property="shopDesc" column="shop_desc" javaType="String"></result>
+        <result property="shopPrice" column="shop_price" javaType="Float"></result>
+        <result property="shopPhone" column="shop_phone" javaType="String"></result>
+        <result property="shopStatus" column="shop_status" javaType="Integer"></result>
+        <result property="shopImg" column="shop_img" javaType="String"></result>
+        <result property="createTime" column="create_time" javaType="java.util.Date"></result>
+        <result property="updateTime" column="update_time" javaType="java.util.Date"></result>
+        <result property="categoryId" column="category_id" javaType="Integer"></result>
+        <result property="userId" column="user_id" javaType="Integer"></result>
+        <result property="saleCount" column="sale_count" javaType="Integer"></result>
+        <result property="shopScore" column="shop_score" javaType="Integer"></result>
+        <association property="categoryMaster" column="category_id" javaType="CategoryMaster" select="edu.qtech.rs.dao.CategoryMasterDao.selectById"></association>
+        <association property="user" column="user_id" javaType="UserInfo" select="edu.qtech.rs.dao.UserDao.selectOne"></association>
+    </resultMap>
+    <select id="selectByName" parameterType="String" resultMap="resultMap">
+        SELECT DISTINCT s.* from product_info p,shop_info s WHERE (p.product_name like '%${shopname}%' and p.shop_id=s.shop_id and s.shop_status=1 and s.shop_address like '%${address}%') or s.shop_name like '%${shopname}%' and s.shop_status=1 and s.shop_address like '%${address}%'
+    </select>
+    <select id="selectById" parameterType="Integer" resultMap="resultMap">
+        select * from shop_info where shop_id=#{shopId} and shop_status=1
+    </select>
+    <select id="selectBySale" parameterType="String" resultMap="resultMap">
+        select * from shop_info where shop_status=1 and shop_address like '%${address}%' order by sale_count desc limit 5
+    </select>
+    <select id="selectByCategory" resultMap="resultMap">
+        select * from shop_info where category_id=#{cid} and shop_status=1 and shop_address like '%${address}%'
+    </select>
+    <select id="selectBySaleCount" resultMap="resultMap">
+        select * from shop_info where shop_status=1 order by sale_count desc
+    </select>
+    <select id="selectByNameAndSale" parameterType="String" resultMap="resultMap">
+         SELECT DISTINCT s.* from product_info p,shop_info s WHERE (p.product_name like '%${shopname}%' and p.shop_id=s.shop_id and s.shop_status=1 and s.shop_address like '%${address}%') or s.shop_name like '%${shopname}%' and s.shop_status=1 and s.shop_address like '%${address}%' order by sale_count desc
+    </select>
+    <select id="selectByNameAndReview" parameterType="String" resultMap="resultMap">
+         SELECT DISTINCT s.* from product_info p,shop_info s WHERE (p.product_name like '%${shopname}%' and p.shop_id=s.shop_id and s.shop_status=1 and s.shop_address like '%${address}%') or s.shop_name like '%${shopname}%' and s.shop_status=1 and s.shop_address like '%${address}%' order by shop_score desc
+    </select>
+    <select id="selectByNameAndPrice" parameterType="String" resultMap="resultMap">
+         SELECT DISTINCT s.* from product_info p,shop_info s WHERE (p.product_name like '%${shopname}%' and p.shop_id=s.shop_id and s.shop_status=1 and s.shop_address like '%${address}%') or s.shop_name like '%${shopname}%' and s.shop_status=1 and s.shop_address like '%${address}%' order by shop_price desc
+    </select>
+    <select id="selectByNameAndCidAndSale" resultMap="resultMap">
+         SELECT DISTINCT s.* from product_info p,shop_info s WHERE (p.product_name like '%${shopname}%' and p.shop_id=s.shop_id and s.category_id=#{cid} and s.shop_status=1 and s.shop_address like '%${address}%') or s.shop_name like '%${shopname}%' and s.category_id=#{cid} and s.shop_status=1 and s.shop_address like '%${address}%' order by sale_count desc
+    </select>
+    <select id="selectByNameAndCidAndReview" resultMap="resultMap">
+         SELECT DISTINCT s.* from product_info p,shop_info s WHERE (p.product_name like '%${shopname}%' and p.shop_id=s.shop_id and s.category_id=#{cid} and s.shop_status=1 and s.shop_address like '%${address}%') or s.shop_name like '%${shopname}%' and s.category_id=#{cid} and s.shop_status=1 and s.shop_address like '%${address}%' order by shop_score desc
+    </select>
+    <select id="selectByNameAndCidAndPrice" resultMap="resultMap">
+         SELECT DISTINCT s.* from product_info p,shop_info s WHERE (p.product_name like '%${shopname}%' and p.shop_id=s.shop_id and s.category_id=#{cid} and s.shop_status=1 and s.shop_address like '%${address}%') or s.shop_name like '%${shopname}%' and s.category_id=#{cid} and s.shop_status=1 and s.shop_address like '%${address}%' order by shop_price desc
+    </select>
+    <select id="selectOftenBuy" parameterType="Integer" resultMap="resultMap">
+        select distinct s.* from order_master o,shop_info s where o.shop_id=s.shop_id and o.user_id=#{id} order by o.order_id desc
+    </select>
+    <update id="update" parameterType="ShopInfo">
+        update shop_info
+        <set>
+            <if test="shopName!=null">
+                shop_name=#{shopName},
+            </if>
+            <if test="shopAddress!=null">
+                shop_address=#{shopAddress},
+            </if>
+            <if test="shopDesc!=null">
+                shop_desc=#{shopDesc},
+            </if>
+            <if test="shopPrice!=null">
+                shop_price=#{shopPrice},
+            </if>
+            <if test="shopPhone!=null">
+                shop_phone=#{shopPhone},
+            </if>
+            <if test="shopStatus!=null">
+                shop_status=#{shopStatus},
+            </if>
+            <if test="shopImg!=null">
+                shop_img=#{shopImg},
+            </if>
+            <if test="createTime!=null">
+                create_time=#{createTime},
+            </if>
+            <if test="updateTime!=null">
+                update_time=#{updateTime},
+            </if>
+            <if test="categoryId!=null">
+                category_id=#{categoryId},
+            </if>
+            <if test="userId!=null">
+                user_id=#{userId},
+            </if>
+            <if test="saleCount!=null">
+                sale_count=#{saleCount},
+            </if>
+            <if test="shopScore!=null">
+                shop_score=#{shopScore}
+            </if>
+        </set>
+        where shop_id=#{shopId}
+    </update>
+    <select id="selectByOnlyName" parameterType="String" resultMap="resultMap">
+        select * from shop_info where shop_name=#{shopname}
+    </select>
+    <insert id="insert" parameterType="ShopInfo">
+        insert into shop_info(shop_name,shop_address,shop_desc,shop_price,shop_phone,shop_status,shop_img,create_time,update_time,
+        category_id,user_id) values(#{shopName},#{shopAddress},#{shopDesc},#{shopPrice},#{shopPhone},
+        #{shopStatus},#{shopImg},#{createTime},#{updateTime},#{categoryId},#{userId})
+    </insert>
+    <select id="selectByUid" parameterType="Integer" resultMap="resultMap">
+        select * from shop_info where user_id=#{uid}
+    </select>
+    <select id="selectByStatus" parameterType="Integer" resultMap="resultMap">
+        select * from shop_info where shop_status=#{id} order by create_time
+    </select>
+    <select id="selectByStatusAndKey" parameterType="String" resultMap="resultMap">
+        select * from shop_info where shop_status=0 and (shop_name like '%${keyword}%' or shop_address like '%${keyword}%') order by create_time
+    </select>
+    <select id="selectByIdAndCheck" parameterType="Integer" resultMap="resultMap">
+        select * from shop_info where shop_id=#{shopId} and shop_status=0
+    </select>
+    <select id="selectAll" resultMap="resultMap">
+        select * from shop_info
+    </select>
+    <select id="selectByOnlyId" parameterType="Integer" resultMap="resultMap">
+        select * from shop_info where shop_id=#{id}
+    </select>
+    <select id="selectByKey" parameterType="String" resultMap="resultMap">
+        select * from shop_info where shop_name like '%${key}%'
+    </select>
+    <select id="selectByApply" resultMap="resultMap">
+        select * from shop_info where shop_name=#{shopname} and shop_address=#{add}
+    </select>
+</mapper>

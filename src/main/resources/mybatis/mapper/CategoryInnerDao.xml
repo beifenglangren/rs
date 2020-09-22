@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.qtech.rs.dao.CategoryInnerDao">
+    <resultMap id="resultMap" type="CategoryInner">
+        <id property="categoryId" column="category_id" javaType="Integer"></id>
+        <result property="categoryName" column="category_name" javaType="String"></result>
+        <result property="shopId" column="shop_id" javaType="Integer"></result>
+    </resultMap>
+    <select id="selectByShopId" parameterType="Integer" resultMap="resultMap">
+        select * from category_inner where shop_id=#{shopId}
+    </select>
+    <insert id="insert" parameterType="CategoryInner" useGeneratedKeys="true">
+        insert into category_inner(category_name,shop_id) values(#{categoryName},#{shopId})
+    </insert>
+    <select id="selectById" parameterType="Integer" resultMap="resultMap">
+        select * from category_inner where category_id=#{id}
+    </select>
+    <update id="update" parameterType="CategoryInner">
+        update category_inner
+        <set>
+            <if test="categoryName!=null">
+                category_name=#{categoryName},
+            </if>
+            <if test="shopId!=null">
+                shop_id=#{shopId}
+            </if>
+        </set>
+        where category_id=#{categoryId}
+    </update>
+    <select id="selectByName" parameterType="String" resultMap="resultMap">
+        select * from category_inner where category_name=#{name}
+    </select>
+    <delete id="delete" parameterType="Integer">
+        delete from category_inner where category_id=#{id}
+    </delete>
+    <select id="selectEditName" resultMap="resultMap">
+        select * from category_inner where category_name=#{name} and category_id not in (#{id}) and shop_id=#{sid}
+    </select>
+    <select id="selectByNameAndSid" resultMap="resultMap">
+        select * from category_inner where category_name=#{name} and shop_id=#{sid}
+    </select>
+</mapper>
